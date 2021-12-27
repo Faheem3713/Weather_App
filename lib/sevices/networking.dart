@@ -13,4 +13,10 @@ class Networking {
     final place = decodedData['sys']['name'];
     return decodedData;
   }
+
+  Future getCity(String url) async {
+    http.Response response = await http.get(Uri.parse(url));
+    final decoded = jsonDecode(response.body);
+    return decoded;
+  }
 }

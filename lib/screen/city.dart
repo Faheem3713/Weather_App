@@ -1,36 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:weather_app/screen/city.dart';
 import 'package:weather_app/sevices/networking.dart';
 import 'package:weather_app/sevices/weathermodel.dart';
 
-class LocationScreen extends StatefulWidget {
-  final weatherData;
+class CityScreen extends StatefulWidget {
+  final cityData;
 
-  const LocationScreen({Key? key, this.weatherData}) : super(key: key);
+  const CityScreen({Key? key, this.cityData}) : super(key: key);
+
   @override
-  State<LocationScreen> createState() => _LocationScreenState();
+  _CityScreenState createState() => _CityScreenState();
 }
 
-class _LocationScreenState extends State<LocationScreen> {
+class _CityScreenState extends State<CityScreen> {
   DateTime date = DateTime.now();
   int? condition;
   int? temperature;
   String? place;
-  String? text;
-
-  void getWeather() {
-    condition = widget.weatherData['weather'][0]['id'];
-    double temp = widget.weatherData['main']['temp'];
-    temperature = temp.toInt();
-    place = widget.weatherData['name'];
-  }
+  String text = '';
 
   @override
   void initState() {
-    getWeather();
-    print(condition);
+    getCity(widget.cityData);
+
     super.initState();
+  }
+
+  Future<void> getCity(String text) async {
+    final data = await Networking().getCity(
+        'http://api.openweathermap.org/data/2.5/weather?q=$text&appid=7a8717cfb54fea32bdf6464917701593&units=metric');
+    condition = data['weather'][0]['id'];
+    double temp = data['main']['temp'];
+    temperature = temp.toInt();
+    place = data['name'];
+    print(temperature);
   }
 
   @override
@@ -43,20 +46,13 @@ class _LocationScreenState extends State<LocationScreen> {
         elevation: 0,
         title: TextField(
           onChanged: (value) {
-            setState(() {
-              text = value;
-            });
+            text = value;
           },
           decoration: InputDecoration(
               suffixIcon: IconButton(
                 onPressed: () async {
-                  await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => CityScreen(
-                          cityData: text,
-                        ),
-                      ));
+                  await getCity(text);
+                  setState(() {});
                 },
                 icon: Icon(FontAwesomeIcons.search),
                 color: Colors.black54,

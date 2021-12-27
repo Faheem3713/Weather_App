@@ -16,6 +16,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   void toGet() async {
     final data = await locationData().getLocation();
+
     final decoded = await Networking().getData(
         'http://api.openweathermap.org/data/2.5/weather?lat=${data.latitude}&lon=${data.longitude}&appid=$apiKey&units=metric');
     Navigator.push(
